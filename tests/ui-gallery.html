@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>FlashPaste · 全页面预览</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f3f7f5;color:#192d2b;font:14px/1.6 system-ui}header{padding:24px 28px;background:white;border-bottom:1px solid #dce6e3}h1{font-size:24px;margin:0}header p{color:#5f7471;margin:6px 0 0}.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:24px;padding:24px;max-width:1680px;margin:auto}nav{position:sticky;top:20px;align-self:start;display:grid;gap:5px;max-height:calc(100vh - 40px);overflow:auto}nav a{display:block;padding:9px 12px;border-radius:8px;text-decoration:none;color:#385951;font-size:13px}nav a:hover{background:#e1efe7}nav a[aria-current=page]{background:#137566;color:white}main{min-width:0}h2{font-size:21px;margin:0}.description{color:#5f7471;margin:8px 0 18px;max-width:900px}.route{display:inline-block;font-size:12px;background:#e7f0eb;border-radius:5px;padding:3px 8px;color:#216855;margin-top:8px}.preview{background:#e7eeea;border:1px solid #d5e0da;border-radius:12px;padding:18px;min-height:240px}.preview img{display:block;width:100%;height:auto;margin:auto;border-radius:8px;box-shadow:0 3px 20px #153c2920}.preview.mobile img{max-width:390px}.links{display:flex;justify-content:space-between;gap:16px;margin:18px 0}a{color:#137566;text-underline-offset:3px}.flow{padding:12px 16px;background:#e9f3ed;border:1px solid #cbded3;margin-top:18px;border-radius:8px;color:#356052}a:focus-visible{outline:3px solid #70bba9;outline-offset:3px}#openImage{font-size:13px}
+    @media(max-width:800px){header{padding:20px}.layout{grid-template-columns:1fr;padding:16px;gap:20px}nav{position:static;display:flex;gap:6px;overflow:auto;max-height:none;padding-bottom:8px}nav a{white-space:nowrap;flex-shrink:0;background:white;border:1px solid #dce6e3}.preview{padding:8px}.flow{font-size:12px}}
+  </style>
+</head>
+<body>
+  <header><h1>FlashPaste · 全页面预览</h1><p>点击左侧切换页面与状态。均为本地截图／演示数据，不连接生产账户；新版已另行部署并通过有限线上烟测。</p><div class="flow">首次：输入 Token → 可选记住设备 30 天 → 工作台。再次访问：有效会话自动进入；无效才显示登录框。公开分享链接不要求登录。</div></header>
+  <div class="layout"><nav id="navigation" aria-label="页面与状态"></nav><main><h2 id="title"></h2><span id="route" class="route"></span><p id="description" class="description"></p><div class="preview" id="preview"><img id="image" alt=""></div><div class="links"><a id="previous" href="#home">上一页</a><a id="openImage" href="login-desktop.png" target="_blank" rel="noopener">打开原尺寸截图</a><a id="next" href="#home-mobile">下一页</a></div></main></div>
+  <script>
+    const pages = [
+      ['home','01 · 首页 / Token 登录','login-desktop.png','/ · 无有效会话时','没有有效会话才显示 Token 登录入口；可选记住设备 30 天。有效会话自动进入工作台，验证前不加载私有内容。'],
+      ['home-mobile','02 · 手机首页','login-mobile.png','/ · 手机','手机上的同一登录入口。输入 Token 验证成功后才进入工作台。'],
+      ['login-error','03 · Token 无效','login-error.png','/ · 登录失败','错误留在登录页内提示，不加载看板。不会将 Token 放进 URL。'],
+      ['member','04 · 普通成员工作台','member-desktop.png','/app · Normal','仅有内容创建和授权范围内的看板，不提供 Token 管理入口。这里展示的是合成 API 数据。'],
+      ['super','05 · Super 工作台','desktop.png','/app · Super','可管理全站有效内容和 Token。创建分享默认只填正文；标题入口默认折叠。'],
+      ['mobile','06 · 手机工作台','mobile.png','/app · 手机','单栏布局，顶部快捷入口可跳到创建、看板和 Token 管理。'],
+      ['empty','07 · 空看板','empty-workspace.png','/app · 暂无有效内容','新空间或暂无授权时显示明确的空状态，引导创建第一份分享。'],
+      ['text','08 · 内容查看','viewer-text.png','/app · 内容预览区','点击内容后，在工作台预览区显示正文。关闭会清理已渲染的内容。'],
+      ['html','09 · HTML 查看','viewer-html.png','/app · HTML 预览区','HTML 在隔离 iframe 中显示；公开 HTML 禁止脚本执行。'],
+      ['tokens','10 · Token 创建结果','token-created.png','/app · Token 管理区，仅 Super','创建后明文仅显示一次，可复制或隐藏。此处使用的是测试用假凭证。'],
+      ['manage','11 · 授权与有效期','manage-dialog.png','/app · 居中管理弹窗','管理访问方式、授权 Token 和到期时间；保存失败保留表单输入。'],
+      ['revoke','12 · 危险操作确认','dialog-mobile.png','/app · 撤销 Token 弹窗','默认聚焦取消，说明撤销影响；请求期间禁用重复提交。'],
+      ['delete','13 · 删除内容确认','dialog-desktop.png','/app · 删除确认弹窗','删除前明确展示目标和不可恢复的后果。'],
+      ['burn','14 · 阅后即焚确认','burn-confirm.png','/app · 获授权成员读取前','先提醒只能读取一次，用户取消不会读取或焚毁。创建者和 Super 可免焚预览。'],
+      ['burned','15 · 焚毁后的查看','burned-view.png','/app · 单次读取结果','读取后从服务端焚毁；已取得的正文保留在当前预览区，关闭后不能再次读取。'],
+      ['public','16 · 公开分享页','public-share.png','/v/:id · 无需登录','外部接收者直接访问单条公开内容，不会看到工作台或内容索引。无标题内容显示“无标题分享”。'],
+      ['unavailable','17 · 内容不可用','unavailable.png','/v/:id · 404','不存在、已失效或没有公开访问权限时统一提示，不透露内容是否真实存在。'],
+      ['error','18 · 网络／服务错误','list-error.png','/app · 加载失败','页面内提示并保留上次列表；临时服务异常不会把用户退出登录。'],
+      ['bootstrap','19 · 首次初始化','bootstrap.png','/ · 仅首次部署初始化','只在数据库尚无 Token 时显示首个 Super 凭证。安全保存后前往首页登录。截图已替换为演示文本。'],
+      ['session','20 · 会话验证失败','session-retry.png','/app · 验证 Token 期间','网络或服务异常时先停留在验证页面，不加载内容，也不擅自清除凭证。明确无效的 Token 才会清除并退回首页。']
+    ];
+    const navigation = document.getElementById('navigation');
+    for (const item of pages) { const link=document.createElement('a');link.href='#'+item[0];link.textContent=item[1];navigation.append(link); }
+    function render(){let index=pages.findIndex(item=>item[0]===location.hash.slice(1));if(index<0)index=0;const [key,label,file,route,description]=pages[index];document.getElementById('title').textContent=label;document.getElementById('route').textContent=route;document.getElementById('description').textContent=description;document.getElementById('image').src=file;document.getElementById('image').alt=label;document.getElementById('preview').classList.toggle('mobile',file.includes('mobile'));document.getElementById('openImage').href=file;document.getElementById('previous').href='#'+pages[(index+pages.length-1)%pages.length][0];document.getElementById('next').href='#'+pages[(index+1)%pages.length][0];for(const link of navigation.children){if(link.hash==='#'+key)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}}
+    addEventListener('hashchange',render);render();
+  </script>
+</body>
+</html>

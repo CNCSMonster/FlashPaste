@@ -1,0 +1,583 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23137566'/%3E%3Cpath d='M18 6 9 18h6l-1 8 9-12h-6z' fill='white'/%3E%3C/svg%3E">
+  <meta name="referrer" content="no-referrer">
+  <meta name="robots" content="noindex, nofollow">
+  <meta http-equiv="Cache-Control" content="no-store">
+  <meta name="flashpaste-build" content="2026-10-23.3">
+  <title>FlashPaste · 临时内容工作台</title>
+  <style>
+    :root{
+      color-scheme:light;
+      --ink:#16241f;--ink-soft:#3d544d;--muted:#5f746d;
+      --line:#e4ece8;--line-strong:#d3dfda;
+      --brand:#137566;--brand-dark:#0b584c;--brand-soft:#eaf4f0;
+      --danger:#ae3538;--surface:#fff;--bg:#f7f9f8;--radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.6 system-ui,-apple-system,"Segoe UI","Noto Sans SC",sans-serif;-webkit-font-smoothing:antialiased}
+    button,input,select,textarea{font:inherit;color:inherit}
+    button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+    button{min-height:36px;border:1px solid var(--line-strong);border-radius:9px;padding:7px 13px;background:#fff;color:var(--ink-soft);cursor:pointer;font-weight:600;font-size:13px;line-height:1.35;white-space:nowrap}
+    button:hover:not(:disabled){background:#f3f8f6;border-color:#b8cdc5;color:var(--ink)}
+    button:disabled{opacity:.45;cursor:not-allowed}
+    a{color:var(--brand);text-underline-offset:3px}
+    button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid #4fa594;outline-offset:2px}
+    .primary{background:var(--brand);border-color:var(--brand);color:#fff}
+    .primary:hover:not(:disabled){background:var(--brand-dark);border-color:var(--brand-dark);color:#fff}
+    .danger{color:var(--danger)}
+    .danger-fill{background:var(--danger);border-color:var(--danger);color:#fff}
+    .danger-fill:hover:not(:disabled){background:#8f2b2e;border-color:#8f2b2e;color:#fff}
+    .quiet,.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+    .quiet:hover:not(:disabled),.ghost:hover:not(:disabled){background:#edf4f1;border-color:transparent;color:var(--ink)}
+    a.ghost{display:inline-flex;align-items:center;text-decoration:none;font-size:12.5px;font-weight:600;border-radius:8px;padding:4px 10px}
+    .hidden,[hidden]{display:none!important}
+    .shell{max-width:1140px;margin:0 auto;padding:0 24px}
+
+    .topbar{position:sticky;top:0;z-index:40;background:#f7f9f8;border-bottom:1px solid var(--line)}
+    .topbar-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;height:58px}
+    .brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:var(--ink);min-width:0}
+    .brand-mark{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--brand);color:#fff;font-size:15px;font-weight:800;line-height:1;flex-shrink:0}
+    .brand-name{font-size:16px;font-weight:750;letter-spacing:-.2px}
+    .brand-note{font-size:12px;color:var(--muted);font-weight:450;padding-left:10px;margin-left:2px;border-left:1px solid var(--line-strong);white-space:nowrap}
+    .topbar-right{display:flex;align-items:center;gap:6px;min-width:0}
+    .identity{display:flex;align-items:center;gap:7px;min-width:0;font-size:12.5px;color:var(--ink-soft);font-weight:550}
+    .identity-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:190px}
+    .role{display:inline-block;padding:1px 7px;border-radius:5px;font-size:11px;font-weight:650;background:var(--brand-soft);color:#1f6b58;white-space:nowrap}
+
+    h1,h2,h3,p{margin:0}
+    h1,h2,h3{letter-spacing:-.2px}
+    small,.hint{font-size:12px;color:var(--muted)}
+    .muted{color:var(--muted)}
+
+    .page-head{padding:26px 0 18px}
+    .page-head h1{font-size:22px;font-weight:750;line-height:1.35}
+    .page-head p{margin-top:3px;color:var(--muted);font-size:13px}
+
+    .workspace-grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,1fr);gap:18px;align-items:stretch}
+    #board{display:flex;flex-direction:column}
+    #board .toolbar,#board .list-error{flex-shrink:0}
+    #items{flex:1;display:flex;flex-direction:column}
+    .card{min-width:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:0 1px 2px rgba(16,45,39,.035)}
+    .card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:17px 20px 13px}
+    .card-head h2{font-size:15px;font-weight:700}
+    .card-head p{font-size:12.5px;color:var(--muted);margin-top:2px}
+    .card-head>button{flex-shrink:0;white-space:nowrap;min-height:30px;padding:4px 10px;font-size:12px}
+    .board-actions{display:flex;align-items:center;gap:8px;flex-shrink:0}
+    .updated{font-size:11.5px;color:#8b9d97;font-variant-numeric:tabular-nums}
+    #shareHelp{margin-bottom:12px}
+    .card-body{padding:0 20px 20px}
+
+    .field{display:flex;flex-direction:column;gap:5px;min-width:0;margin-bottom:14px}
+    .field>span,.field>label{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+    .optional{font-weight:400;color:var(--muted)}
+    input,select,textarea{width:100%;min-width:0;min-height:38px;border:1px solid var(--line-strong);border-radius:8px;padding:8px 10px;color:var(--ink);background:#fcfdfd;font-size:13.5px}
+    input:hover,select:hover,textarea:hover{border-color:#c3d4ce}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:#7cb9a8;background:#fff;box-shadow:0 0 0 3px rgba(19,117,102,.11)}
+    input::placeholder,textarea::placeholder{color:#8b9d97}
+    textarea{resize:vertical;line-height:1.7}
+    input:disabled,select:disabled{background:#f1f5f3;color:var(--muted)}
+    .editor{font:13px/1.75 ui-monospace,SFMono-Regular,Consolas,monospace;min-height:184px;resize:none}
+    .editor.dragging{border-color:var(--brand);background:#f2faf6;box-shadow:0 0 0 3px rgba(19,117,102,.14)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+    .title-input{margin-bottom:10px;font-weight:600}
+    .editor-tools{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:8px 0 16px;min-width:0}
+    .file-button{display:inline-flex;align-items:center;gap:6px;min-height:36px;border:1px solid var(--line-strong);border-radius:8px;padding:6px 12px;color:var(--ink-soft);background:#fff;cursor:pointer;font-size:12.5px;font-weight:600;flex-shrink:0}
+    .file-button:hover{background:#f3f8f6;border-color:#b8cdc5;color:var(--brand)}
+    .file-button:focus-within{outline:2px solid #4fa594;outline-offset:2px}
+    .file-input{position:absolute;width:1px;height:1px;min-height:0;padding:0;opacity:0;overflow:hidden}
+    .file-note{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .size-badge{margin-left:auto;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0}
+    .format-chip{display:inline-flex;align-items:center;gap:3px;flex-shrink:0;font-size:11.5px;color:var(--muted)}
+    .format-chip select{width:auto;min-height:0;border:0;border-radius:6px;padding:3px 4px;background:transparent;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer}
+    .format-chip select:hover{background:#eef4f1;color:var(--brand)}
+    .format-chip select:focus{background:#eef4f1;border-color:transparent;box-shadow:0 0 0 2px #4fa59455}
+    .share-hint{margin:0 0 12px}
+    .quota-hint{margin:4px 0 0;font-size:11.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+    .quota-hint.warn{color:#9a5b00;font-weight:600}
+    .submit{width:100%;min-height:42px;margin-top:2px}
+    .submit-hint{text-align:center;margin-top:8px}
+
+    .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .form-grid .field{margin-bottom:12px}
+    .form-grid .field>span{font-size:12px;color:var(--ink-soft)}
+    .form-grid select{min-height:34px;font-size:12.5px;padding:6px 9px;border-color:transparent;background:#f2f6f4}
+    .form-grid select:hover{border-color:#d3dfda;background:#fff}
+    .form-grid select:focus{border-color:#7cb9a8;background:#fff}
+    .notice{font-size:12px;line-height:1.55;color:#52685f;background:#f4f8f6;border-radius:8px;padding:8px 11px;margin:0 0 14px}
+    .error{color:var(--danger);font-size:12.5px;overflow-wrap:anywhere}
+    .error:empty{display:none}
+    .result{margin-top:14px;border:1px solid #bfe0cd;background:#f3faf6;border-radius:10px;padding:12px 14px;overflow-wrap:anywhere}
+    .result p{font-size:12.5px;margin-bottom:8px;color:#2f5c4a}
+    .result-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .result a{display:block;font-size:12.5px;overflow-wrap:anywhere;margin-bottom:2px}
+
+    .toolbar{display:flex;gap:8px;padding:0 20px 13px}
+    .toolbar input{flex:1;min-height:34px;font-size:13px}
+    .toolbar select{width:112px;min-height:34px;font-size:13px}
+    .count{font-size:11px;font-weight:600;display:inline-block;border-radius:5px;background:#eef4f1;color:var(--muted);padding:1px 6px;margin-left:6px;vertical-align:2px}
+    .list{padding:0 20px}
+    .item{border-top:1px solid var(--line);padding:13px 0;min-width:0}
+    .item:first-child{border-top:0}
+    .item-title{font-size:13.5px;font-weight:650;overflow-wrap:anywhere;line-height:1.5}
+    .item-meta{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:5px;color:var(--muted);font-size:11.5px}
+    .badge{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:4px;background:#eef3f1;color:#4e6860;line-height:1.6}
+    .badge.public{color:#2f5b93;background:#edf3fb}
+    .badge.burn{color:#8f5417;background:#fff3e0}
+    .item-actions{display:flex;align-items:center;gap:2px;flex-wrap:wrap;margin-top:7px}
+    .item-actions button{min-height:28px;padding:4px 7px;border:1px solid transparent;background:transparent;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted)}
+    .item-actions button:hover:not(:disabled){background:#eff5f2;color:var(--brand)}
+    .item-actions button.danger{color:#a2545a}
+    .item-actions button.danger:hover:not(:disabled){background:#fdf2f2;color:var(--danger)}
+    .item-actions .row-primary{border-color:var(--line-strong);background:#fff;color:var(--ink);padding:4px 10px}
+    .item-actions .row-primary:hover:not(:disabled){border-color:#a9c6bb;background:#f7fbf9;color:var(--brand)}
+    .row-menu{position:relative;display:inline-flex}
+    .row-menu>summary{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;color:var(--muted);cursor:pointer;list-style:none;font-size:15px;line-height:1;user-select:none}
+    .row-menu>summary::-webkit-details-marker{display:none}
+    .row-menu>summary:hover,.row-menu[open]>summary{background:#eff5f2;color:var(--ink)}
+    .row-menu-panel{position:absolute;right:0;top:30px;z-index:20;min-width:126px;padding:4px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 12px 32px rgba(16,45,39,.14);display:flex;flex-direction:column;gap:1px}
+    .row-menu-panel button{min-height:32px;padding:6px 9px;border:0;border-radius:6px;background:transparent;font-size:12.5px;font-weight:550;text-align:left;color:var(--ink-soft)}
+    .row-menu-panel button:hover:not(:disabled){background:#f1f6f4;color:var(--ink)}
+    .row-menu-panel button.danger{color:var(--danger)}
+    .row-menu-panel button.danger:hover:not(:disabled){background:#fdf2f2}
+    .empty{padding:22px 0 8px;text-align:left;color:var(--muted);font-size:12.5px}
+    .empty strong{display:block;font-size:13px;font-weight:600;color:var(--ink-soft);margin-bottom:2px}
+    .empty button{margin-top:12px}
+    .list-error{padding:14px 20px;color:var(--danger);font-size:12.5px;border-top:1px solid var(--line)}
+
+    .tokens-card{margin-top:18px}
+    .tokens-card>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;cursor:pointer;list-style:none}
+    .tokens-card>summary::-webkit-details-marker{display:none}
+    .tokens-card>summary h2{font-size:15px;font-weight:700}
+    .tokens-card>summary:hover{background:#fbfdfc}
+    .tokens-card[open]>summary{border-bottom:1px solid var(--line)}
+    .tokens-caret{width:8px;height:8px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(45deg);transition:transform .15s;margin-right:2px}
+    .tokens-card[open] .tokens-caret{transform:rotate(-135deg)}
+    .tokens-body{padding:16px 20px 20px}
+    .tokens-toolbar{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+    .tokens-toolbar p{font-size:12.5px;color:var(--muted)}
+    .tokens-toolbar button{min-height:30px;padding:4px 10px;font-size:12px}
+    .token-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.5fr) minmax(120px,.4fr) auto;align-items:end;gap:10px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--line)}
+    .token-form .field{margin-bottom:0}
+    .token-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 26px}
+    .token-id{font:11px/1.6 ui-monospace,monospace;color:var(--muted);overflow-wrap:anywhere;display:block;margin-top:5px}
+    .secret{display:block;background:#fff;border:1px solid #cdded3;border-radius:7px;padding:10px;margin:10px 0;word-break:break-all;user-select:all;font:12px/1.8 ui-monospace,monospace}
+
+    .viewer{margin-top:18px}
+    .viewer iframe{display:block;width:100%;height:75vh;border:1px solid var(--line);border-radius:10px;background:#fff}
+    .viewer-actions{display:flex;align-items:center;gap:6px}
+    .viewer pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.8 ui-monospace,monospace}
+
+    .login-card{max-width:430px;margin:11vh auto 40px;padding:30px;background:linear-gradient(180deg,#fff,#fcfffd)}
+    .login-card h1{font-size:22px;font-weight:750;line-height:1.35}
+    .login-card>p{color:var(--muted);font-size:13px;margin:8px 0 22px}
+    .login-card button[type=submit]{width:100%;min-height:41px}
+    .login-card .error{margin:10px 0}
+    .login-foot{border-top:1px solid var(--line);margin-top:20px;padding-top:15px;font-size:11.5px;line-height:1.7;color:var(--muted)}
+    .remember{display:flex;align-items:center;gap:8px;font-size:12.5px;margin:0 0 16px;color:var(--ink-soft)}
+    .remember input{width:16px;min-height:16px;height:16px;margin:0;accent-color:var(--brand)}
+    .login-card .migration{margin:14px 0;padding:11px;border:1px solid var(--line);border-radius:9px;font-size:12.5px}
+    .migration button{margin-top:9px}
+
+    .footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 10px;padding:24px 0 28px;text-align:center;color:var(--muted);font-size:11.5px}
+    .build{color:#9aaba5;font-variant-numeric:tabular-nums}
+
+    .app-dialog{position:fixed;inset:0;margin:auto;width:min(480px,calc(100% - 32px));max-height:calc(100dvh - 40px);border:1px solid var(--line);border-radius:16px;padding:0;color:var(--ink);box-shadow:0 25px 100px #0c302b38;overflow:auto}
+    .app-dialog::backdrop{background:#102a2766;backdrop-filter:blur(3px)}
+    .dialog-body{padding:24px}
+    .dialog-description{font-size:12.5px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
+    .dialog-fields{display:grid;gap:13px;margin-top:18px}
+    .dialog-field{display:grid;gap:5px;font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+    .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+    .dialog-error{margin-top:12px}
+    .dialog-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#fff0ed;color:var(--danger);font-weight:800;margin-bottom:12px}
+    .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#173d34;color:#fff;box-shadow:0 8px 30px #173d3426;padding:11px 17px;border-radius:10px;max-width:calc(100% - 32px);width:max-content;overflow-wrap:anywhere;z-index:50;font-size:12.5px;pointer-events:none}
+    .toast.error{background:#8c292d;color:white}
+    .scroll-target{scroll-margin-top:74px}
+
+    @media(max-width:900px){
+      .workspace-grid{grid-template-columns:1fr}
+
+      .token-list{grid-template-columns:1fr}
+      .brand-note{display:none}
+      .identity-name{max-width:140px}
+    }
+    @media(max-width:560px){
+      .shell{padding:0 16px}
+      .topbar-inner{height:54px}
+      .page-head{padding:20px 0 14px}
+      .page-head h1{font-size:20px}
+      .card-head{padding:15px 16px 12px}
+      .card-body{padding:0 16px 16px}
+      .toolbar{padding:0 16px 12px;flex-wrap:wrap}
+      .list{padding:0 16px}
+      .list-error{padding:14px 16px}
+      .form-grid{grid-template-columns:1fr;gap:0}
+      .format-chip>span{display:none}
+      .token-form{grid-template-columns:1fr}
+      .token-form button{width:100%}
+      .login-card{padding:22px;margin:32px auto}
+      .dialog-body{padding:22px}
+      .dialog-actions button{flex:1}
+      .viewer-actions{flex-direction:column;align-items:stretch}
+      .viewer-actions>*{width:100%}
+      .identity-name{max-width:84px}
+      .topbar .role{display:none}
+      .topbar-right{min-width:0}
+      .updated{display:none}
+      .item-actions button{min-height:34px}
+      .toast{bottom:16px}
+    }
+    @media(prefers-reduced-motion:no-preference){button,summary{transition:background .14s,border-color .14s,color .14s}}
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="shell topbar-inner">
+      <a class="brand" href="/"><span class="brand-mark" aria-hidden="true">↗</span><span class="brand-name">FlashPaste</span><span class="brand-note">轻分享 · 有期限</span></a>
+      <div class="topbar-right hidden" id="account"><div class="identity"><span class="identity-name" id="who"></span><span id="identityRole" class="role"></span></div><button id="logout" class="ghost" type="button">退出</button></div>
+    </div>
+  </header>
+  <div class="shell">
+    <section id="login" class="card login-card" aria-labelledby="loginTitle">
+      <h1 id="loginTitle">进入你的临时内容空间</h1><p>管理分享内容、指定访问权限，让每一次分享都有明确的有效期。</p>
+      <form id="loginForm"><label class="field"><span>访问 Token</span><input id="tokenInput" type="password" autocomplete="current-password" placeholder="粘贴你的 Token" required aria-describedby="loginError"></label><label class="remember"><input id="rememberDevice" type="checkbox"><span>记住此设备（30 天）</span></label><p id="httpWarning" class="notice hidden">当前为 HTTP 调试模式，仅支持当前标签页的 Bearer 登录，不支持记住设备。正式使用请通过 HTTPS 访问。</p><button id="loginBtn" class="primary" type="submit">进入工作台</button><p id="loginError" class="error" role="alert"></p></form>
+      <div id="legacyImport" class="migration hidden">发现旧版标签页中保存的 Token。你可以确认使用它登录；成功后会移除旧存储。<button id="importToken" type="button">使用旧会话登录</button></div>
+      <div class="login-foot">没有 Token？请向管理员获取，不开放匿名注册。<br>自用设备可记住登录；公共设备请勿勾选，并在使用后退出。<br>收到公开分享链接？直接打开该链接即可查看，无需登录。</div>
+    </section>
+    <section id="restoring" class="card login-card hidden" aria-labelledby="restoreTitle"><h1 id="restoreTitle">正在验证你的 Token</h1><p>验证通过后，才会加载此 Token 可访问的内容。</p><p id="restoreError" class="error" role="alert"></p><button id="retrySession" class="primary" type="button">重新验证</button><div class="login-foot"><a href="/">返回登录首页</a></div></section>
+    <main id="app" class="hidden">
+      <div class="page-head"><div><h1>临时内容工作台</h1><p>分享此刻需要的内容，不留下长期负担。</p></div></div>
+      <div class="workspace-grid">
+        <section id="composer" class="card scroll-target" aria-labelledby="composerTitle">
+          <div class="card-head"><div><h2 id="composerTitle">创建分享</h2></div></div>
+          <form id="createForm" class="card-body">
+            <label class="sr-only" for="title">标题（可选）</label>
+            <input id="title" class="title-input" placeholder="标题（可选），留空也能创建">
+            <label class="sr-only" for="content">分享内容</label>
+            <textarea id="content" class="editor" rows="8" placeholder="在这里粘贴内容，或导入 .html / .md / .txt 文件…" required aria-describedby="contentSize"></textarea>
+            <div class="editor-tools"><label class="file-button"><span aria-hidden="true">⤒</span> 导入文件<input id="file" class="file-input" type="file" accept=".html,.htm,.txt,.md" aria-label="导入文件"></label><label class="format-chip" title="按内容自动识别，可手动更改"><span>格式</span><select id="type" aria-label="内容格式"><option value="text">纯文本</option><option value="markdown">Markdown</option><option value="html">HTML</option></select></label><span id="contentHelp" class="hint file-note"></span><span id="contentSize" class="size-badge">0 B / 500 KiB</span></div>
+            <div class="form-grid"><label class="field"><span>访问方式</span><select id="visibility"><option value="public">公开链接</option><option value="token">Token 保护</option></select></label><label class="field"><span>有效期</span><select id="ttl"><option value="3600">1 小时</option><option value="21600">6 小时</option><option value="86400">1 天</option><option value="172800">2 天</option><option value="burn">阅后即焚</option></select></label></div>
+            <p id="shareHelp" class="hint share-hint"></p>
+            <label id="grantsField" class="field hidden"><span>授权 Token 名称 <span class="optional">可选</span></span><input id="grants" placeholder="team-a, team-b" aria-describedby="grantsHelp"><small id="grantsHelp">多个名称用逗号分隔。留空时仅创建者和 Super 可访问。</small></label>
+            <button id="create" class="primary submit" type="submit">创建分享</button>
+            <p class="hint submit-hint">创建后可直接复制分享链接</p>
+            <p id="createError" class="error" role="alert"></p><div id="createResult" class="result hidden" role="status"></div>
+          </form>
+        </section>
+        <section id="board" class="card scroll-target" aria-labelledby="boardTitle"><div class="card-head"><div><h2 id="boardTitle">内容库<span id="itemCount" class="count">0</span></h2><p id="boardHelp">仅显示当前 Token 可访问的有效内容。</p><p id="quotaHint" class="quota-hint hidden"></p></div><div class="board-actions"><span id="boardUpdated" class="updated"></span><button id="refresh" class="ghost" type="button">刷新</button></div></div><div class="toolbar"><input id="search" type="search" aria-label="搜索内容标题" placeholder="搜索标题…"><select id="filter" aria-label="筛选访问方式"><option value="all">全部内容</option><option value="public">公开链接</option><option value="token">Token 保护</option></select></div><div id="listError" class="list-error hidden" role="alert"></div><div id="items" class="list" aria-live="polite"></div></section>
+      </div>
+      <section id="viewer" class="card viewer scroll-target hidden" aria-labelledby="viewerTitle"><div class="card-head"><div><h2 id="viewerTitle">内容预览</h2><p id="viewerHelp"></p></div><div class="viewer-actions"><a id="openFullView" class="ghost hidden" target="_blank" rel="noopener noreferrer">新标签页全屏查看 ↗</a><button id="closeView" type="button">关闭预览</button></div></div><div id="rendered" class="card-body"></div></section>
+      <details id="tokensCard" class="card tokens-card hidden"><summary><h2 id="tokensTitle">Token 管理<span id="tokenCount" class="count">0</span></h2><span class="tokens-caret" aria-hidden="true"></span></summary><div class="tokens-body"><div class="tokens-toolbar"><p>Normal 用于成员访问；Super 可管理全部内容及 Token。</p><button id="refreshTokens" class="ghost" type="button">刷新</button></div><form id="tokenForm" class="token-form"><label class="field"><span>Token 名称</span><input id="tokenName" placeholder="例如：设计协作组" required></label><label class="field"><span>权限级别</span><select id="tokenLevel"><option value="normal">Normal · 普通成员</option><option value="super">Super · 全局管理</option></select></label><label class="field" id="quotaField"><span>容量上限（MiB）</span><input id="tokenQuota" type="number" min="1" max="10240" step="1" placeholder="默认 100"></label><button id="createToken" class="primary" type="submit">创建 Token</button></form><p id="tokenError" class="error" role="alert"></p><div id="tokenResult" class="result hidden" role="status"></div><div id="tokensError" class="error" role="alert"></div><div id="tokens" class="token-list"></div></div></details>
+    </main>
+    <footer class="footer"><span>有期限的分享，有边界的访问。</span><span class="build">界面 2026-10-23.3</span></footer>
+  </div>
+  <dialog id="appDialog" class="app-dialog" aria-labelledby="dialogTitle" aria-describedby="dialogDescription"><form id="dialogForm" class="dialog-body"><div id="dialogIcon" class="dialog-icon hidden" aria-hidden="true">!</div><h2 id="dialogTitle"></h2><p id="dialogDescription" class="dialog-description"></p><div id="dialogFields" class="dialog-fields"></div><p id="dialogError" class="error dialog-error" role="alert"></p><div class="dialog-actions"><button type="button" id="dialogCancel">取消</button><button type="submit" id="dialogSubmit" class="primary">确认</button></div></form></dialog>
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+  <script>
+    'use strict';
+    const $ = id => document.getElementById(id);
+    const INLINE_BYTES = 512000, HTML_BYTES = 10 * 1024 * 1024;
+    const sizeLimit = (type = $('type').value) => type === 'html' ? HTML_BYTES : INLINE_BYTES;
+    const limitLabel = () => $('type').value === 'html' ? '10 MiB' : '500 KiB';
+    let importedFile = null;
+    const editorContent = () => importedFile && importedFile.normalized === $('content').value ? importedFile.original : $('content').value;
+    let IS_APP = location.pathname === '/app';
+    document.title = IS_APP ? '工作台 · FlashPaste' : '登录 · FlashPaste';
+    function enterAppRoute() { IS_APP = true; document.title = '工作台 · FlashPaste'; history.replaceState(null, '', '/app'); }
+    let TOKEN = sessionStorage.getItem('flashpaste_token') || '', AUTH_MODE = null, IDENTITY = null, NEEDS_REAUTH = false, SELF_ROTATING = false, items = [], tokens = [], quota = null, toastTimer;
+    const mib = bytes => (bytes / 1048576).toFixed(1).replace(/\.0$/, '');
+    const canManage = item => IDENTITY && (IDENTITY.level === 'super' || item.created_by === IDENTITY.token_id);
+    const isBurn = item => item.burn_after_read === true || item.burn_after_read === 1;
+    const contentLabel = item => (item.title || '').trim() || '无标题 · ' + item.id.slice(0, 8);
+    const uniqueIds = value => [...new Set(value.split(/[,，\n]/).map(x => x.trim()).filter(Boolean))];
+    function element(tag, className, text) { const node = document.createElement(tag); if (className) node.className = className; if (text !== undefined) node.textContent = text; return node; }
+    function notify(message, type = '') { $('toast').textContent = message; $('toast').className = 'toast' + (type === 'error' ? ' error' : ''); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.add('hidden'), type === 'error' ? 6500 : 4000); }
+    function endSession(message = '') { sessionStorage.removeItem('flashpaste_token'); TOKEN = ''; IDENTITY = null; items = []; tokens = []; $('items').replaceChildren(); $('tokens').replaceChildren(); $('tokenResult').replaceChildren(); $('tokenResult').classList.add('hidden'); $('rendered').replaceChildren(); $('viewer').classList.add('hidden'); $('app').classList.add('hidden'); $('account').classList.add('hidden'); $('tokensCard').classList.add('hidden'); $('login').classList.remove('hidden'); $('loginError').textContent = message; if (IS_APP) { if (message) sessionStorage.setItem('flashpaste_notice', message); location.replace('/'); } }
+    async function request(path, options = {}, authenticated = true) {
+      if (options.method && !['GET','HEAD'].includes(options.method) && options.body === undefined) options = { ...options, body: '{}' };
+      let response;
+      try { response = await fetch(path, { ...options, credentials: 'same-origin', signal: AbortSignal.timeout(30000), headers: { ...(options.body ? { 'Content-Type': 'application/json' } : {}), ...(options.headers || {}), ...(authenticated && AUTH_MODE === 'bearer' ? { Authorization: 'Bearer ' + TOKEN } : {}) } }); }
+      catch { throw Error(options.method && options.method !== 'GET' ? '连接中断或超时。操作可能已完成，请先刷新列表核对，避免重复提交。' : '网络连接失败或超时，请检查连接后重试。'); }
+      if (response.status === 204) return {};
+      let data;
+      try { data = await response.json(); }
+      catch { if (response.ok) throw Error('响应读取失败。操作可能已完成，请刷新列表核对。'); data = {}; }
+      if (!response.ok) {
+        if (response.status === 401 && authenticated && IDENTITY && !SELF_ROTATING && !NEEDS_REAUTH) { endSession('登录已失效，请重新输入 Token。'); throw Error('登录已失效，请重新登录。'); }
+        if (data.code === 'QUOTA_EXCEEDED') {
+          const error = Error('当前有效内容已占用 ' + mib(data.used_bytes) + ' / ' + mib(data.limit_bytes) + ' MiB，本次需要 ' + mib(data.incoming_bytes) + ' MiB。请先删除不需要的内容，或等待现有内容到期。');
+          error.status = 409; error.code = 'QUOTA_EXCEEDED'; throw error;
+        }
+        const messages = { 400: path === '/api/tokens' ? 'Token 名称可能已存在，或权限级别无效，请检查后重试。' : '提交失败，请检查内容、授权和有效期。', 401: 'Token 无效，请检查后重试。', 403: '当前 Token 没有此操作的权限。', 404: path.startsWith('/api/tokens/lookup') ? '找不到该名称的 Token，请检查授权名称。' : '内容不存在、已失效，或当前 Token 无权访问。', 413: '内容过大：HTML 最大 10 MiB，文本／Markdown 最大 500 KiB；JSON 请求最大 16 MiB。', 429: '操作过于频繁，请稍后重试。' };
+        const error = Error(messages[response.status] || (response.status >= 500 ? '服务暂时不可用，请稍后重试。' : '操作失败，请稍后重试。')); error.status = response.status; error.code = data.code; throw error;
+      }
+      return data;
+    }
+    async function run(button, busyText, task, errorNode) {
+      if (button.disabled) return;
+      const label = button.textContent; button.disabled = true; button.textContent = busyText; button.setAttribute('aria-busy', 'true'); if (errorNode) errorNode.textContent = '';
+      try { await task(); } catch (error) { if (errorNode) errorNode.textContent = error.message; else notify(error.message, 'error'); }
+      finally { button.disabled = NEEDS_REAUTH && !$('tokenResult').contains(button); button.textContent = label; button.removeAttribute('aria-busy'); }
+    }
+    function action(label, handler, className = '') { const button = element('button', className, label); button.type = 'button'; button.onclick = () => run(button, '处理中…', () => handler(button)); return button; }
+    function rowMenu(entries) { const details = element('details', 'row-menu'); const summary = element('summary', '', '⋯'); summary.setAttribute('aria-label', '更多操作'); const panel = element('div', 'row-menu-panel'); for (const node of entries) panel.append(node); details.append(summary, panel); return details; }
+    document.addEventListener('click', event => { for (const item of document.querySelectorAll('details.row-menu[open]')) if (!item.contains(event.target)) item.open = false; });
+    document.addEventListener('click', event => { const target = event.target.closest('.row-menu-panel button'); if (target) for (const item of document.querySelectorAll('details.row-menu[open]')) item.open = false; });
+    async function copy(value) { try { await navigator.clipboard.writeText(value); notify('已复制到剪贴板'); } catch { throw Error('浏览器未允许复制，请手动选择并复制。'); } }
+    function showDialog({ title, description = '', fields = [], confirmText = '确认', danger = false, onConfirm = async () => {} }) {
+      const dialog = $('appDialog'); if (dialog.open) return Promise.resolve(false);
+      const previous = document.activeElement; let busy = false, confirmed = false;
+      $('dialogTitle').textContent = title; $('dialogDescription').textContent = description; $('dialogError').textContent = ''; $('dialogFields').replaceChildren(); $('dialogFields').classList.toggle('hidden', !fields.length); $('dialogIcon').classList.toggle('hidden', !danger);
+      const submit = $('dialogSubmit'), cancel = $('dialogCancel'), controls = {};
+      submit.textContent = confirmText; submit.className = danger ? 'danger-fill' : 'primary'; submit.disabled = false; cancel.disabled = false;
+      for (const field of fields) {
+        const wrap = element('label', 'dialog-field'); wrap.append(element('span', '', field.label));
+        const input = document.createElement(field.options ? 'select' : field.multiline ? 'textarea' : 'input');
+        if (field.options) { for (const option of field.options) { const node = element('option', '', option.label); node.value = option.value; node.disabled = !!option.disabled; input.append(node); } }
+        else if (field.multiline) input.rows = 3; else input.type = field.type || 'text';
+        input.name = field.name; input.value = field.value ?? ''; input.required = !!field.required;
+        for (const attr of ['placeholder', 'min', 'max', 'step']) if (field[attr] !== undefined) input.setAttribute(attr, field[attr]);
+        wrap.append(input); $('dialogFields').append(wrap); controls[field.name] = input;
+      }
+      return new Promise(resolve => {
+        $('dialogForm').onsubmit = async event => {
+          event.preventDefault(); if (busy) return; busy = true; submit.disabled = true; cancel.disabled = true; submit.textContent = '处理中…'; $('dialogError').textContent = '';
+          try { await onConfirm(Object.fromEntries(Object.entries(controls).map(([key, input]) => [key, input.value]))); confirmed = true; dialog.close(); }
+          catch (error) { $('dialogError').textContent = error.message; }
+          finally { busy = false; submit.disabled = false; cancel.disabled = false; submit.textContent = confirmText; }
+        };
+        cancel.onclick = () => dialog.close(); dialog.oncancel = event => { if (busy) event.preventDefault(); };
+        dialog.onclick = event => { const rect = dialog.getBoundingClientRect(); if (!busy && event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); };
+        dialog.onclose = () => { $('dialogForm').onsubmit = null; dialog.onclose = null; if (previous && previous.isConnected) previous.focus(); else if (IDENTITY) $('refresh').focus(); resolve(confirmed); };
+        dialog.showModal(); (danger ? cancel : Object.values(controls)[0] || cancel).focus();
+      });
+    }
+    async function login(value) {
+      const identity = await request(AUTH_MODE === 'cookie' ? '/api/auth/login' : '/api/auth/verify', { method: 'POST', body: JSON.stringify({ token: value, remember_device: $('rememberDevice').checked }) }, false);
+      if (AUTH_MODE === 'cookie') { sessionStorage.removeItem('flashpaste_token'); TOKEN = ''; }
+      else { TOKEN = value; sessionStorage.setItem('flashpaste_token', value); }
+      $('tokenInput').value = ''; $('loginError').textContent = '';
+      if (!IS_APP) enterAppRoute();
+      await enterWorkspace(identity);
+    }
+    async function enterWorkspace(identity) {
+      IDENTITY = identity;
+      $('restoring').classList.add('hidden');
+      $('login').classList.add('hidden'); $('app').classList.remove('hidden'); $('account').classList.remove('hidden'); $('who').textContent = identity.name; $('identityRole').textContent = identity.level === 'super' ? 'Super · 全局管理' : 'Normal · 普通成员';
+      $('tokensCard').classList.toggle('hidden', identity.level !== 'super'); $('boardHelp').textContent = identity.level === 'super' ? '查看全站有效内容，管理分享与访问权限。' : '查看自己创建和明确授权给你的有效内容。';
+      await Promise.all([refresh(), identity.level === 'super' ? loadTokens() : Promise.resolve()]);
+    }
+    $('loginForm').onsubmit = event => { event.preventDefault(); run($('loginBtn'), '正在验证…', () => login($('tokenInput').value.trim()), $('loginError')); };
+    $('logout').onclick = () => run($('logout'), '正在退出…', async () => { if (AUTH_MODE === 'cookie') await request('/api/auth/logout', { method: 'POST' }, false); endSession(); $('title').value = ''; $('content').value = ''; $('grants').value = ''; $('file').value = ''; $('createResult').replaceChildren(); $('createResult').classList.add('hidden'); $('tokenInput').focus(); updateSize(); });
+    $('importToken').onclick = () => run($('importToken'), '正在迁移…', () => login(TOKEN), $('loginError'));
+    function updateSize() { const size = new TextEncoder().encode(editorContent()).length; const label = size >= 1048576 ? (size/1048576).toFixed(2)+' MiB' : size >= 1024 ? (size/1024).toFixed(1)+' KiB' : size+' B'; $('contentSize').textContent = label + ' / ' + limitLabel(); $('contentSize').classList.toggle('error', size > sizeLimit()); $('content').setCustomValidity(size > sizeLimit() ? '内容超过 '+limitLabel()+'，请缩小后提交。' : ''); return size; }
+    let typeTouched = false, detectTimer;
+    function detectType(text, allowHtml) {
+      const head = text.slice(0, 4000);
+      if (allowHtml && (/^\s*(<!doctype\s+html|<html[\s>])/i.test(head) || /<body[\s>]/i.test(head))) return 'html';
+      if (/^\s{0,3}(#{1,6}\s|```|>\s|[-*+]\s|\d+\.\s)/m.test(head) || /\[[^\]]+\]\([^)]+\)/.test(head) || /\*\*[^*]+\*\*/.test(head)) return 'markdown';
+      return 'text';
+    }
+    function applyDetected(text, allowHtml) {
+      if (typeTouched) return;
+      const detected = detectType(text, allowHtml);
+      if (detected === $('type').value) return;
+      $('type').value = detected; updateSize(); updateShareMode();
+    }
+    $('content').oninput = () => { importedFile = null; updateSize(); clearTimeout(detectTimer); detectTimer = setTimeout(() => applyDetected($('content').value, false), 400); };
+    $('type').addEventListener('change', () => { typeTouched = true; });
+    $('content').addEventListener('paste', () => setTimeout(() => applyDetected($('content').value, true), 0));
+    async function importFile(file) {
+      if (!file) return;
+      try { const type = /\.html?$/i.test(file.name) ? 'html' : /\.md$/i.test(file.name) ? 'markdown' : 'text'; if (file.size > sizeLimit(type)) throw Error(type==='html' ? 'HTML 文件超过 10 MiB。' : '文本／Markdown 文件超过 500 KiB。'); let text; try { text = new TextDecoder('utf-8',{fatal:true,ignoreBOM:true}).decode(await file.arrayBuffer()); } catch { throw Error('文件必须是 UTF-8 文本，请转换编码后重试。'); } $('content').value = text; importedFile = {original:text,normalized:$('content').value}; typeTouched = false; $('type').value = type; $('contentHelp').textContent = '已导入：' + file.name; updateSize(); updateShareMode(); notify('文件已导入，可继续编辑；不编辑时保留原文件换行与字节。'); }
+      catch (error) { notify(error.message, 'error'); } finally { $('file').value = ''; }
+    }
+    $('file').onchange = () => importFile($('file').files[0]);
+    const dropZone = $('content');
+    for (const type of ['dragenter', 'dragover']) dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.add('dragging'); });
+    for (const type of ['dragleave', 'drop']) dropZone.addEventListener(type, event => { event.preventDefault(); dropZone.classList.remove('dragging'); });
+    dropZone.addEventListener('drop', event => importFile(event.dataTransfer?.files?.[0]));
+    document.addEventListener('dragover', event => event.preventDefault());
+    document.addEventListener('drop', event => event.preventDefault());
+    function updateShareMode() {
+      const burn = $('ttl').value === 'burn';
+      if (burn && $('visibility').value !== 'token') { $('visibility').value = 'token'; notify('阅后即焚仅支持 Token 保护，已切换访问方式。'); }
+      $('visibility').options[0].disabled = burn;
+      const protectedContent = $('visibility').value === 'token'; $('grantsField').classList.toggle('hidden', !protectedContent); $('grants').disabled = !protectedContent;
+      $('shareHelp').textContent = burn ? '获授权成员首次读取后立即焚毁；创建者和 Super 可免焚预览。最长保留 7 天。' : protectedContent ? ($('type').value === 'html' ? '仅指定 Token 可访问。HTML 脚本可在隔离 iframe 中运行，请只上传可信内容。' : '仅创建者、Super 和明确授权的 Token 可访问。') : ($('type').value === 'html' ? '任何持有链接的人都可查看。公开 HTML 禁止脚本，仅展示静态内容。' : '任何持有链接的人都可查看，请勿放入敏感内容。');
+    }
+    $('visibility').onchange = updateShareMode; $('ttl').onchange = updateShareMode; $('type').onchange = () => { updateSize(); updateShareMode(); }; updateShareMode();
+    $('createForm').onsubmit = event => {
+      event.preventDefault(); run($('create'), '正在创建…', async () => {
+        if (updateSize() > sizeLimit()) throw Error('内容超过 '+limitLabel()+'。');
+        const granted = [];
+        if ($('visibility').value === 'token') for (const name of uniqueIds($('grants').value)) { const found = await request('/api/tokens/lookup?name=' + encodeURIComponent(name)); granted.push(found.id); }
+        const ttl = $('ttl').value;
+        const submitted = editorContent(), submittedTitle = $('title').value;
+        const created = await request('/api/contents', { method: 'POST', body: JSON.stringify({ title: submittedTitle.trim() || null, content_type: $('type').value, content: submitted, visibility: $('visibility').value, ttl: ttl === 'burn' ? 604800 : Number(ttl), burn_after_read: ttl === 'burn', allowed_tokens: granted }) });
+        const result = $('createResult'); result.replaceChildren(element('p', '', created.url ? '分享已创建 · 复制链接即可发送给他人' : '内容已创建 · 获授权成员可在工作台查看'));
+        if (created.url) { const url = new URL(created.url, location.origin).href, link = element('a', '', url); link.href = url; link.target = '_blank'; link.rel = 'noopener'; result.append(link, action('复制分享链接', () => copy(url))); }
+        else result.append(element('code', 'token-id', '内容 ID：' + created.id));
+        result.classList.remove('hidden');
+        // Only clear what was submitted; keep a new draft the user typed while the request was in flight.
+        if ($('content').value === submitted) { importedFile = null; $('content').value = ''; $('contentHelp').textContent = ''; typeTouched = false; $('type').value = 'text'; updateSize(); updateShareMode(); }
+        if ($('title').value === submittedTitle) $('title').value = '';
+        await refresh();
+      }, $('createError'));
+    };
+    let refreshSequence = 0;
+    async function refresh() {
+      const sequence = ++refreshSequence; $('items').setAttribute('aria-busy', 'true'); $('listError').classList.add('hidden');
+      if (!items.length) $('items').replaceChildren(element('p', 'empty', '正在加载内容…'));
+      try { const data = await request('/api/dashboard'); if (sequence !== refreshSequence || !IDENTITY) return; items = data.items || []; quota = data.quota || null; renderQuota(); renderItems(); $('boardUpdated').textContent = '更新于 ' + new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }); }
+      catch (error) { if (sequence !== refreshSequence) return; $('listError').textContent = error.message + (items.length ? ' 下方保留上次加载的列表。' : ' 点击「刷新」重试。'); $('listError').classList.remove('hidden'); if (!items.length) $('items').replaceChildren(); }
+      finally { if (sequence === refreshSequence) $('items').removeAttribute('aria-busy'); }
+    }
+    function renderQuota() {
+      const node = $('quotaHint');
+      if (!quota) { node.classList.add('hidden'); return; }
+      node.classList.remove('hidden');
+      node.textContent = '已用 ' + mib(quota.used_bytes) + ' / ' + mib(quota.limit_bytes) + ' MiB';
+      node.classList.toggle('warn', quota.used_bytes / quota.limit_bytes >= 0.9);
+    }
+    $('refresh').onclick = () => run($('refresh'), '加载中…', refresh);
+    $('search').oninput = renderItems; $('filter').onchange = renderItems;
+    function renderItems() {
+      const query = $('search').value.trim().toLocaleLowerCase(), filter = $('filter').value;
+      const shown = items.filter(item => contentLabel(item).toLocaleLowerCase().includes(query) && (filter === 'all' || item.visibility === filter));
+      $('itemCount').textContent = String(items.length); $('items').replaceChildren();
+      if (!shown.length) { const empty = element('div', 'empty'); empty.append(element('strong', '', items.length ? '没有匹配的内容' : '还没有有效内容'), element('p', '', items.length ? '换个关键词，或调整访问方式筛选。' : '在左侧创建第一份分享，或等待他人授权给你。')); if (items.length) empty.append(action('清除筛选', async () => { $('search').value = ''; $('filter').value = 'all'; renderItems(); })); $('items').append(empty); }
+      for (const item of shown) {
+        const row = element('article', 'item'), metadata = element('div', 'item-meta'), actions = element('div', 'item-actions');
+        row.append(element('h3', 'item-title', contentLabel(item)));
+        metadata.append(element('span', 'badge' + (item.visibility === 'public' ? ' public' : ''), item.visibility === 'public' ? '公开链接' : 'Token 保护'));
+        if (isBurn(item)) metadata.append(element('span', 'badge burn', '阅后即焚'));
+        if (item.content_type) metadata.append(element('span', '', ({text:'纯文本', markdown:'Markdown', html:'HTML'})[item.content_type] || item.content_type));
+        const expiry = element('time', '', new Date(item.expires_at * 1000).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false }) + ' 到期'); expiry.dateTime = new Date(item.expires_at * 1000).toISOString(); metadata.append(expiry);
+        actions.append(action(isBurn(item) ? canManage(item) ? '免焚预览' : '读取并焚毁' : '查看内容', button => view(item, button), 'row-primary'));
+        const secondary = [];
+        if (item.visibility === 'public') secondary.push(action('复制链接', () => copy(location.origin + '/v/' + encodeURIComponent(item.id))));
+        if (canManage(item)) {
+          secondary.push(action('管理', () => manageContent(item)));
+          secondary.push(action('删除', async () => {
+            const ok = await showDialog({ title: '删除这条内容？', description: '「' + contentLabel(item) + '」将永久删除，所有分享链接立即失效。此操作无法撤销。', confirmText: '删除内容', danger: true, onConfirm: () => request('/api/contents/' + encodeURIComponent(item.id), { method: 'DELETE' }) });
+            if (ok) { notify('内容已删除'); if ($('viewer').dataset.id === item.id) closeViewer(); await refresh(); }
+          }, 'danger'));
+        }
+        if (secondary.length) actions.append(rowMenu(secondary));
+        row.append(metadata, actions); $('items').append(row);
+      }
+    }
+    function localDateTime(timestamp) { const date = new Date(timestamp * 1000); return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 19); }
+    async function manageContent(item) {
+      const data = await request('/api/contents/' + encodeURIComponent(item.id));
+      const originalExpiry = localDateTime(data.expires_at);
+      const ok = await showDialog({ title: '管理内容', description: '授权使用 Token ID，可在 Token 管理中复制。公开内容不保留授权列表；到期时间只能提前，按当前设备时区显示。', confirmText: '保存更改', fields: [
+        { name: 'visibility', label: '访问方式', value: data.visibility, options: [{ value:'public', label:'公开链接', disabled:isBurn(data) }, { value:'token', label:'Token 保护' }] },
+        { name:'allowed', label:'授权 Token ID', value:(data.allowed_tokens || []).join(', '), multiline:true, placeholder:'多个 ID 用逗号或换行分隔；留空撤销全部授权' },
+        { name:'expiry', label:'到期时间（本地时间）', type:'datetime-local', step:'1', required:true, value:originalExpiry, min:localDateTime(Math.floor(Date.now()/1000) + 1), max:originalExpiry }
+      ], onConfirm: async values => {
+        const expiry = values.expiry === originalExpiry ? data.expires_at : Math.floor(new Date(values.expiry).getTime()/1000);
+        if (!Number.isFinite(expiry) || expiry > data.expires_at || expiry <= Date.now()/1000) throw Error('请选择尚未到期、且不晚于原到期时间的日期。');
+        await request('/api/contents/' + encodeURIComponent(item.id), { method:'PATCH', body:JSON.stringify({ visibility:values.visibility, expires_at:expiry, allowed_tokens: values.visibility === 'token' ? uniqueIds(values.allowed) : [] }) });
+      } });
+      if (ok) { notify('内容设置已更新'); await refresh(); }
+    }
+    function markdownHtml(text) { const esc = value => value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); return text.split(/\r?\n/).map(line => { const match = line.match(/^(#{1,6})\s+(.*)$/); if (match) return '<h' + match[1].length + '>' + esc(match[2]) + '</h' + match[1].length + '>'; return line.trim() ? '<p>' + esc(line).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/`([^`]+)`/g, '<code>$1</code>') + '</p>' : ''; }).join(''); }
+    async function view(item, opener) {
+      if (isBurn(item) && !canManage(item)) { const ok = await showDialog({ title:'读取后将立即焚毁', description:'这份内容只能成功读取一次。关闭后无法再次打开，也无法由其他成员再次读取。请确认已经准备好保存所需信息。', confirmText:'读取并焚毁', danger:true }); if (!ok) return; }
+      const preview = isBurn(item) && canManage(item);
+      const consumePost = isBurn(item) && !preview && AUTH_MODE === 'cookie';
+      const data = await request('/api/contents/' + encodeURIComponent(item.id) + (consumePost ? '/consume' : '/body' + (preview ? '?consume=0' : '')), consumePost ? { method:'POST' } : {});
+      $('rendered').replaceChildren(); $('viewerTitle').textContent = contentLabel(item); $('viewerHelp').textContent = preview ? '免焚预览 · 本次查看不会消耗内容。' : isBurn(item) ? '内容已从服务端焚毁，关闭此预览后无法再次读取。' : '内容仅在下方预览区展示。';
+      if (data.content_type === 'html' || data.content_type === 'markdown') {
+        const frame = document.createElement('iframe'); frame.title = '分享内容预览'; frame.setAttribute('sandbox', data.content_type === 'html' && data.visibility === 'token' ? 'allow-scripts' : '');
+        frame.srcdoc = data.content_type === 'html' ? (data.visibility === 'public' ? '<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data: blob:">' : '') + data.content : '<meta charset="utf-8"><style>body{font:15px/1.8 system-ui;padding:16px;overflow-wrap:anywhere}code{background:#eef4f1;padding:2px 4px}</style>' + markdownHtml(data.content);
+        $('rendered').append(frame);
+      } else $('rendered').append(element('pre', '', data.content));
+      if (item.visibility === 'public') { $('openFullView').href = '/v/' + encodeURIComponent(item.id); $('openFullView').classList.remove('hidden'); } else { $('openFullView').classList.add('hidden'); }
+      $('viewer').dataset.id = item.id; $('viewer').classList.remove('hidden'); $('viewer').scrollIntoView({ block:'start' }); $('closeView').focus(); $('closeView').onclick = () => { closeViewer(); if (opener.isConnected) opener.focus(); else $('refresh').focus(); };
+      if (isBurn(item) && !preview) await refresh();
+    }
+    function closeViewer() { $('viewer').classList.add('hidden'); $('openFullView').classList.add('hidden'); $('rendered').replaceChildren(); delete $('viewer').dataset.id; }
+    let tokenSequence = 0;
+    async function loadTokens() {
+      const sequence = ++tokenSequence; $('tokensError').textContent = ''; $('tokens').setAttribute('aria-busy', 'true');
+      try { const data = await request('/api/tokens'); if (sequence !== tokenSequence || !IDENTITY) return; tokens = data.tokens || []; renderTokens(); }
+      catch (error) { if (sequence === tokenSequence) $('tokensError').textContent = error.message + ' 点击「刷新」重试。'; }
+      finally { if (sequence === tokenSequence) $('tokens').removeAttribute('aria-busy'); }
+    }
+    $('refreshTokens').onclick = () => run($('refreshTokens'), '加载中…', loadTokens);
+    $('tokenLevel').onchange = () => $('quotaField').classList.toggle('hidden', $('tokenLevel').value === 'super');
+    function showSecret(plaintext, title, reauthenticate = false) {
+      const result = $('tokenResult'); result.replaceChildren(element('strong', '', title), element('p', '', '明文只返回一次，请立即复制并安全保存。关闭此提示或离开页面后无法找回。'), element('code', 'secret', plaintext));
+      const actions = element('div', 'result-actions'); actions.append(action('复制 Token', () => copy(plaintext)), action(reauthenticate ? '已保存，重新登录' : '已保存，隐藏凭证', async () => { result.replaceChildren(); result.classList.add('hidden'); if (reauthenticate) endSession('Token 已轮换，请使用新 Token 重新登录。'); })); result.append(actions); result.classList.remove('hidden'); result.scrollIntoView({ block:'nearest' });
+      if (reauthenticate) { NEEDS_REAUTH = true; result.append(element('p', '', '当前会话已经失效，请先保存新 Token，再重新登录。')); for (const control of document.querySelectorAll('#app button,#app input,#app select,#app textarea,#account button')) if (!result.contains(control)) control.disabled = true; }
+    }
+    function renderTokens() {
+      $('tokenCount').textContent = String(tokens.length); $('tokens').replaceChildren();
+      const superCount = tokens.filter(token => token.level === 'super').length;
+      for (const token of tokens) {
+        const row = element('article', 'item'), meta = element('div', 'item-meta'), actions = element('div', 'item-actions');
+        row.append(element('h3', 'item-title', token.name)); meta.append(element('span', 'role', token.level === 'super' ? 'Super · 全局管理' : 'Normal · 普通成员'));
+        meta.append(element('span', '', token.level === 'super' ? '不限额' : '上限 ' + mib(token.quota_bytes || 100 * 1024 * 1024) + ' MiB'));
+        const self = token.id === IDENTITY.token_id;
+        if (self) meta.append(element('span', 'badge', '当前登录'));
+        row.append(meta, element('code', 'token-id', token.id));
+        actions.append(action('复制 ID', () => copy(token.id), 'row-primary'));
+        const rotate = action('轮换', async () => {
+          let plaintext;
+          const ok = await showDialog({ title:'轮换「' + token.name + '」？', description:'旧凭证及该 Token 的全部旧登录会话将立即失效，现有授权关系保留。新凭证只返回一次，请准备好安全保存。' + ($('tokenResult').textContent ? '这会覆盖当前显示的明文凭证，请先确认已保存。' : '') + (self ? '请保存新 Token，随后重新登录。' : ''), confirmText:'轮换 Token', danger:true, onConfirm:async () => {
+            const guarded = self && AUTH_MODE === 'cookie';
+            if (guarded) SELF_ROTATING = true;
+            try { const data = await request('/api/tokens/' + encodeURIComponent(token.id) + '/rotate', { method:'POST' }); plaintext = data.token_plaintext; if (guarded) NEEDS_REAUTH = true; else if (self) { TOKEN = plaintext; sessionStorage.setItem('flashpaste_token', TOKEN); } }
+            finally { if (guarded) SELF_ROTATING = false; }
+          } });
+          if (ok) { const reauthenticate = self && AUTH_MODE === 'cookie'; showSecret(plaintext, 'Token 已轮换', reauthenticate); if (!reauthenticate) await loadTokens(); }
+        });
+        const revoke = action('撤销', async () => {
+          const ok = await showDialog({ title:'撤销「' + token.name + '」？', description:'此凭证将立即失效，通过 ACL 获得的内容权限也会被撤销。操作无法恢复。' + (self ? '这是当前登录凭证，撤销后会退出登录。' : ''), confirmText:'撤销 Token', danger:true, onConfirm:() => request('/api/tokens/' + encodeURIComponent(token.id), { method:'DELETE' }) });
+          if (ok) { if (self) endSession('当前 Token 已撤销，请使用其他 Token 登录。'); else { notify('Token 已撤销'); await loadTokens(); } }
+        }, 'danger');
+        if (token.level === 'super' && superCount === 1) { revoke.disabled = true; revoke.textContent = '最后一个 Super'; revoke.title = '至少保留一个 Super Token，避免失去管理权限。'; }
+        actions.append(rowMenu([rotate, revoke])); row.append(actions); $('tokens').append(row);
+      }
+    }
+    $('tokenForm').onsubmit = event => { event.preventDefault(); run($('createToken'), '正在创建…', async () => {
+      if ($('tokenResult').textContent) { const confirmed = await showDialog({ title:'替换当前凭证提示？', description:'创建新的 Token 会覆盖上一次显示的明文凭证，请先确认已安全保存。', confirmText:'已保存，继续创建' }); if (!confirmed) return; }
+      const name = $('tokenName').value.trim(); if (!name || new TextEncoder().encode(name).length > 64) throw Error('Token 名称不能为空，且不能超过 64 字节。');
+      const level = $('tokenLevel').value, rawQuota = $('tokenQuota').value.trim();
+      const quota_mb = level === 'super' || !rawQuota ? null : Number(rawQuota);
+      if (quota_mb !== null && (!Number.isFinite(quota_mb) || quota_mb < 1 || quota_mb > 10240)) throw Error('容量上限需在 1–10240 MiB 之间，留空使用默认 100 MiB。');
+      const data = await request('/api/tokens', { method:'POST', body:JSON.stringify({ name, level, quota_mb }) }); showSecret(data.token_plaintext || data.token, '新 Token 已创建'); $('tokenName').value = ''; $('tokenQuota').value = ''; await loadTokens();
+    }, $('tokenError')); };
+    function showLogin() {
+      $('restoring').classList.add('hidden'); $('login').classList.remove('hidden'); $('account').classList.add('hidden');
+      $('rememberDevice').disabled = AUTH_MODE !== 'cookie'; $('httpWarning').classList.toggle('hidden', AUTH_MODE !== 'bearer');
+      $('legacyImport').classList.toggle('hidden', !(AUTH_MODE === 'cookie' && TOKEN));
+      $('loginError').textContent = sessionStorage.getItem('flashpaste_notice') || ''; sessionStorage.removeItem('flashpaste_notice');
+    }
+    async function restoreSession() {
+      await run($('retrySession'), '正在验证…', async () => {
+        // The shell inlines this config; the request is only a fallback for static hosting.
+        const config = window.__FLASHPASTE_CONFIG__ || await request('/api/auth/config', {}, false);
+        if (config.cookie_login && location.protocol === 'https:') AUTH_MODE = 'cookie';
+        else if (config.debug_bearer && location.protocol === 'http:') AUTH_MODE = 'bearer';
+        else throw Error('服务尚未正确配置 HTTPS 登录，请联系管理员。');
+        if (AUTH_MODE === 'cookie') {
+          try { const identity = await request('/api/auth/session', {}, false); sessionStorage.removeItem('flashpaste_token'); TOKEN = ''; if (!IS_APP) enterAppRoute(); await enterWorkspace(identity); }
+          catch (error) { if (error.status !== 401) throw error; if (IS_APP) location.replace('/'); else showLogin(); }
+        } else if (IS_APP && TOKEN) {
+          try { await login(TOKEN); } catch (error) { if (error.status === 401) endSession('Token 已失效，请重新输入。'); else throw error; }
+        } else if (IS_APP) location.replace('/');
+        else showLogin();
+      }, $('restoreError'));
+    }
+    $('login').classList.add('hidden'); $('restoring').classList.remove('hidden'); $('retrySession').onclick = restoreSession; restoreSession();
+  </script>
+</body>
+</html>

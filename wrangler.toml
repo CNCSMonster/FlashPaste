@@ -1,0 +1,31 @@
+name = "flashpaste"
+main = "build/worker/shim.mjs"
+compatibility_date = "2026-10-15"
+
+[observability]
+enabled = true
+head_sampling_rate = 0.1
+redact_query_string = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 0.1
+
+[vars]
+FLASHPASTE_ORIGIN = "https://flashpaste.example.workers.dev"
+
+[triggers]
+crons = ["0 * * * *"]
+
+[build]
+command = "worker-build --release -- --no-default-features --features worker"
+
+[[kv_namespaces]]
+binding = "flashpaste_bodies"
+id = "00000000000000000000000000000000"
+
+# D1 数据库绑定
+[[d1_databases]]
+binding = "flashpaste_db"
+database_name = "flashpaste-db"
+database_id = "00000000-0000-0000-0000-000000000000"

@@ -1,0 +1,11 @@
+/target/
+/build/
+/.wrangler/
+/.cloudflare/
+__pycache__/
+*.pyc
+*.db
+*.log
+.env
+.env.*
+.DS_Store

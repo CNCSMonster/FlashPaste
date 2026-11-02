@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rust:
+    name: Rust (fmt / clippy / test / wasm check)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+          targets: wasm32-unknown-unknown
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Format check
+        run: cargo fmt --check
+
+      - name: Clippy (deny warnings)
+        run: cargo clippy --no-default-features --features local -- -D warnings
+
+      - name: Test (local stack)
+        run: cargo test --no-default-features --features local
+
+      - name: Worker target compiles
+        run: cargo check --lib --target wasm32-unknown-unknown --no-default-features --features worker
+
+  cli:
+    name: CLI (python unittest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run CLI tests
+        run: PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -p 'test_cli.py'
+
+# 浏览器类验收（ui-*.cjs / session-*.cjs / large-html.cjs / production-smoke.cjs）
+# 需要本机 Chrome、playwright-core 与（Worker 侧）真实工具链，因此不纳入 CI，
+# 由维护者按 README「验证」一章手工执行并在发布台账中留证。
