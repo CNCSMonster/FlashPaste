@@ -124,7 +124,7 @@ node tests/session-worker.cjs
 
 Worker 开启 10% 采样的日志与 traces，日志剔除查询字符串；错误只记通用故障码，不输出请求凭证或正文。
 
-旧版曾可能将 Token 明文写入 D1。当前远端仍有 `token_value` 空列，检查到非空记录为 0。若要移除此列，先备份，再执行 `ops/drop_legacy_plaintext_token.sql`；若列不存在，不要运行该 SQL。此操作不会由 Worker 自动执行。
+旧版曾可能将 Token 明文写入 D1。当前远端仍有 `token_value` 空列，检查到非空记录为 0。若要移除此列，先备份，再执行 `src/sql/drop_legacy_plaintext_token.sql`；若列不存在，不要运行该 SQL。此操作不会由 Worker 自动执行。
 
 ## 持续集成与许可
 

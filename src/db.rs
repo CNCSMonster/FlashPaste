@@ -75,7 +75,7 @@ impl Database {
                 .any(|name| name == "token_value")
         };
         if has_legacy_plaintext_column {
-            conn.execute_batch(include_str!("../ops/drop_legacy_plaintext_token.sql"))?;
+            conn.execute_batch(include_str!("sql/drop_legacy_plaintext_token.sql"))?;
         }
 
         Ok(Self {
