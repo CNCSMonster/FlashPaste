@@ -81,10 +81,7 @@ impl Database {
         Ok(Self {
             conn: Arc::new(Mutex::new(conn)),
             body_dir: if path == ":memory:" {
-                std::path::PathBuf::from(format!(
-                    "/tmp/opencode/flashpaste-bodies-{}",
-                    generate_id()
-                ))
+                std::env::temp_dir().join(format!("flashpaste-bodies-{}", generate_id()))
             } else {
                 std::path::PathBuf::from(format!("{path}.bodies"))
             },

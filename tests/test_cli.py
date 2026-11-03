@@ -29,7 +29,7 @@ class UntitledCreateTests(unittest.TestCase):
         self.assertIsNone(self.create()["title"])
 
     def test_import_does_not_use_filename_as_title(self):
-        with tempfile.TemporaryDirectory(prefix="flashpaste-cli-", dir="/tmp/opencode") as directory:
+        with tempfile.TemporaryDirectory(prefix="flashpaste-cli-") as directory:
             file = Path(directory) / "不应作为标题.md"
             file.write_text("# 文件正文", encoding="utf-8")
             payload = self.create("--file", str(file))
@@ -41,14 +41,14 @@ class UntitledCreateTests(unittest.TestCase):
         self.assertEqual(self.create("--title", "  自定义标题  ")["title"], "自定义标题")
 
     def test_import_preserves_bom_and_crlf(self):
-        with tempfile.TemporaryDirectory(prefix="flashpaste-cli-", dir="/tmp/opencode") as directory:
+        with tempfile.TemporaryDirectory(prefix="flashpaste-cli-") as directory:
             file = Path(directory) / "original.html"
             original = b"\xef\xbb\xbf<h1>Original</h1>\r\n<p>Body</p>\r\n"
             file.write_bytes(original)
             self.assertEqual(self.create("--file", str(file))["content"].encode("utf-8"), original)
 
     def test_xdg_config_toml_loading(self):
-        with tempfile.TemporaryDirectory(prefix="flashpaste-xdg-", dir="/tmp/opencode") as directory:
+        with tempfile.TemporaryDirectory(prefix="flashpaste-xdg-") as directory:
             cfg_dir = Path(directory) / "flashpaste"
             cfg_dir.mkdir()
             cfg_file = cfg_dir / "config.toml"
