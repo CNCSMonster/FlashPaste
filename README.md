@@ -54,6 +54,7 @@ python3 flashpaste-cli.py list
 - [会话、配置与运维注意](docs/OPERATIONS.md)
 - [测试与验收](docs/TESTING.md)
 - [大正文支持（10 MiB）](docs/LARGE-HTML.md)
+- [更新日志](CHANGELOG.md)
 
 ## 现状与限制
 
