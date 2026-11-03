@@ -2,13 +2,14 @@
 // Only localhost test servers are accepted. Never use production credentials.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os=require('node:os');
 const path = require('node:path');
 const {chromium,request} = require('playwright-core');
 
 module.exports = async function exercise(origin, directory) {
   const url = new URL(origin);
   assert(url.protocol==='https:' && ['localhost','127.0.0.1'].includes(url.hostname),'Only isolated local HTTPS servers are permitted');
-  const output=process.env.FLASHPASTE_UI_OUTPUT || '/tmp/opencode/flashpaste-ux';fs.mkdirSync(output,{recursive:true});
+  const output=process.env.FLASHPASTE_UI_OUTPUT || path.join(os.tmpdir(),'flashpaste-ux');fs.mkdirSync(output,{recursive:true});
   const profile=path.join(directory,'chrome-profile');
   const launch=()=>chromium.launchPersistentContext(profile,{executablePath:process.env.CHROME_PATH || '/usr/bin/google-chrome',headless:true,ignoreHTTPSErrors:true,viewport:{width:1365,height:1000},locale:'zh-CN'});
   let context=await launch(), memberContext, client;

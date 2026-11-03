@@ -2,13 +2,14 @@
 // normal Tokens and content; never rotates the supplied production Super Token.
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
+const os=require('node:os');
 const {chromium,request}=require('playwright-core');
 
 (async()=>{
   assert.equal(process.env.FLASHPASTE_PRODUCTION_SMOKE,'YES','Explicit production smoke opt-in required');
   const origin='https://flashpaste.example.workers.dev';
   const secret=process.env.FLASHPASTE_API_TOKEN;assert(secret,'Production credential required in environment');
-  const root='/tmp/opencode';process.umask(0o077);
+  const root=os.tmpdir();process.umask(0o077);
   const directory=fs.mkdtempSync(root+'/flashpaste-production-smoke-');
   const admin=await request.newContext({baseURL:origin,extraHTTPHeaders:{Authorization:'Bearer '+secret}});
   const anon=await request.newContext({baseURL:origin});

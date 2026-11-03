@@ -1,5 +1,6 @@
 // Runs exclusively against Miniflare/local D1 in a fresh directory.
 const fs=require('node:fs');
+const os=require('node:os');
 const path=require('node:path');
 const net=require('node:net');
 const https=require('node:https');
@@ -9,7 +10,7 @@ const assert=require('node:assert/strict');
 
 (async()=>{
   for(const port of [8789,9241])await new Promise((resolve,reject)=>{const server=net.createServer();server.once('error',()=>reject(Error('Test port occupied: '+port)));server.listen(port,'127.0.0.1',()=>server.close(resolve));});
-  const root=path.join(__dirname,'..'), directory=fs.mkdtempSync('/tmp/opencode/flashpaste-session-worker-'), state=path.join(directory,'state');
+  const root=path.join(__dirname,'..'), directory=fs.mkdtempSync(path.join(os.tmpdir(),'flashpaste-session-worker-')), state=path.join(directory,'state');
   const env={...process.env,CI:'1',WRANGLER_SEND_METRICS:'false'};
   delete env.FLASHPASTE_API_TOKEN;delete env.CLOUDFLARE_API_TOKEN;
   execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',path.join(directory,'key.pem'),'-out',path.join(directory,'cert.pem'),'-days','1','-subj','/CN=localhost','-addext','subjectAltName=IP:127.0.0.1,DNS:localhost'],{stdio:'ignore'});

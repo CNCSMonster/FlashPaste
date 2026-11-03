@@ -1,9 +1,10 @@
-// Real Axum/SQLite UI integration in a fresh /tmp/opencode directory.
+// Real Axum/SQLite UI integration in a fresh temporary directory.
 // cargo build --no-default-features --features local
-// NODE_PATH=/tmp/opencode/flashpaste-ux-tools/node_modules node tests/ui-local.cjs
+// NODE_PATH=<临时目录>/flashpaste-ux-tools/node_modules node tests/ui-local.cjs
 // Port 3000 must be free. Does not touch flashpaste.db in the project directory.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os=require('node:os');
 const path = require('node:path');
 const net = require('node:net');
 const { spawn } = require('node:child_process');
@@ -14,8 +15,8 @@ const { chromium } = require('playwright-core');
     const probe = net.createServer(); probe.once('error', () => reject(Error('Port 3000 is occupied; stop the test rather than touching another server.')));
     probe.listen(3000,'0.0.0.0', () => probe.close(resolve));
   });
-  const directory = fs.mkdtempSync('/tmp/opencode/flashpaste-ui-local-');
-  const output = process.env.FLASHPASTE_UI_OUTPUT || '/tmp/opencode/flashpaste-ux';
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(),'flashpaste-ui-local-'));
+  const output = process.env.FLASHPASTE_UI_OUTPUT || path.join(os.tmpdir(),'flashpaste-ux');
   fs.mkdirSync(output,{recursive:true});
   const server = spawn(path.join(__dirname,'../target/debug/flashpaste'), [], {cwd:directory,stdio:['ignore','pipe','pipe']});
   let log = ''; server.stdout.on('data',data => log+=data); server.stderr.on('data',data => log+=data);

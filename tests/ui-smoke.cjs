@@ -1,13 +1,14 @@
 // Run with playwright-core installed outside the repository:
-// NODE_PATH=/tmp/opencode/flashpaste-ux-tools/node_modules node tests/ui-smoke.cjs
+// NODE_PATH=<临时目录>/flashpaste-ux-tools/node_modules node tests/ui-smoke.cjs
 // Uses only synthetic API fixtures. No production credentials or data.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const os=require('node:os');
 const path = require('node:path');
 const { chromium } = require('playwright-core');
 
 const html = fs.readFileSync(path.join(__dirname, '../static/app.html'), 'utf8');
-const output = process.env.FLASHPASTE_UI_OUTPUT || '/tmp/opencode/flashpaste-ux';
+const output = process.env.FLASHPASTE_UI_OUTPUT || path.join(os.tmpdir(),'flashpaste-ux');
 fs.mkdirSync(output, { recursive: true });
 const csp = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; frame-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'";
 const now = Math.floor(Date.now() / 1000);

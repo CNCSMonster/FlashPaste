@@ -1,4 +1,5 @@
 const fs=require('node:fs');
+const os=require('node:os');
 const path=require('node:path');
 const net=require('node:net');
 const http=require('node:http');
@@ -8,7 +9,7 @@ const exercise=require('./session-browser.cjs');
 
 (async()=>{
   for(const port of [3041,3443])await new Promise((resolve,reject)=>{const server=net.createServer();server.once('error',()=>reject(Error('Test port occupied: '+port)));server.listen(port,'127.0.0.1',()=>server.close(resolve));});
-  const directory=fs.mkdtempSync('/tmp/opencode/flashpaste-session-local-');
+  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'flashpaste-session-local-'));
   execFileSync('openssl',['req','-x509','-newkey','rsa:2048','-nodes','-keyout',path.join(directory,'key.pem'),'-out',path.join(directory,'cert.pem'),'-days','1','-subj','/CN=localhost','-addext','subjectAltName=IP:127.0.0.1,DNS:localhost'],{stdio:'ignore'});
   const child=spawn(path.join(__dirname,'../target/debug/flashpaste'),[],{cwd:directory,env:{...process.env,FLASHPASTE_BIND:'127.0.0.1:3041',FLASHPASTE_ORIGIN:'https://127.0.0.1:3443'},stdio:['ignore','pipe','pipe']});
   let log='';child.stdout.on('data',chunk=>log+=chunk);child.stderr.on('data',chunk=>log+=chunk);

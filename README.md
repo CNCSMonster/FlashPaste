@@ -105,8 +105,8 @@ wrangler deploy --dry-run
 浏览器回归测试需要本机 Chrome 和 `playwright-core`；测试依赖可放在临时目录，不写入项目：
 
 ```bash
-npm install --prefix /tmp/opencode/flashpaste-ux-tools playwright-core --no-audit --no-fund
-export NODE_PATH=/tmp/opencode/flashpaste-ux-tools/node_modules
+npm install --prefix "${TMPDIR:-/tmp}/flashpaste-ux-tools" playwright-core --no-audit --no-fund
+export NODE_PATH="${TMPDIR:-/tmp}/flashpaste-ux-tools/node_modules"
 node tests/ui-smoke.cjs
 cargo build --no-default-features --features local
 node tests/ui-local.cjs
@@ -114,7 +114,7 @@ node tests/session-local.cjs
 node tests/session-worker.cjs
 ```
 
-`ui-smoke.cjs` 使用合成 API 数据覆盖首页／工作台跳转、桌面／手机布局、弹窗、错误反馈及预览安全，截图保存在 `/tmp/opencode/flashpaste-ux/`。`ui-local.cjs` 使用临时目录中的独立 SQLite 库启动真实 Axum 服务，覆盖初始化、登录、创建 Token、私有 ACL、公开分享与阅后即焚；需要端口 3000 空闲。两者均不读取生产凭证或修改生产数据，Chrome 路径可用 `CHROME_PATH` 覆盖。依次运行两项后，目录中的 `index.html` 为全页面截图预览入口；初始化截图会使用演示文本替换凭证。
+`ui-smoke.cjs` 使用合成 API 数据覆盖首页／工作台跳转、桌面／手机布局、弹窗、错误反馈及预览安全，截图保存在 `${TMPDIR:-/tmp}/flashpaste-ux/`。`ui-local.cjs` 使用临时目录中的独立 SQLite 库启动真实 Axum 服务，覆盖初始化、登录、创建 Token、私有 ACL、公开分享与阅后即焚；需要端口 3000 空闲。两者均不读取生产凭证或修改生产数据，Chrome 路径可用 `CHROME_PATH` 覆盖。依次运行两项后，目录中的 `index.html` 为全页面截图预览入口；初始化截图会使用演示文本替换凭证。
 
 `session-local.cjs` 使用隔离 Axum、SQLite 和本地 HTTPS 反向代理（3041／3443 端口）；`session-worker.cjs` 只使用 `--local` 和独立持久化目录，演练旧数据迁移后启动本地 Worker／D1 HTTPS 服务（8789／9241 端口）。需要 OpenSSL、Chrome、playwright-core；Worker 测试还需 Wrangler／Rust Worker 工具链。两端复用浏览器会话验收和 `core-regression.cjs`：真实重启／跨标签页恢复、Cookie 属性、Web Storage 无 Token、CSRF、POST 消费、轮换竞态、自轮换与退出，以及三种格式原样下载、UTF-8 的 500 KiB 边界、全部 TTL、非法输入／角色、ACL 授权撤销／替换、读取时过期和真实 Python CLI。Rust 测试另覆盖到期、存储故障、SQLite WAL 备份和原子竞争。`test_api.sh` 已替换为隔离测试入口，不再对不明来源的 localhost 服务执行过时示例。
 
